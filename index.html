@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leanhuset — PRO-2804 LEAN produksjon</title>
+<style>
+:root{
+  --bg:#f6f4f1; --surface:#ffffff; --surface-2:#faf9f7;
+  --ink:#1b1b1d; --ink-2:#4a4a50; --muted:#82828c;
+  --line:#e2ddd6; --line-2:#cfc8be;
+  --mal:#c2683d; --jit:#2f6f9f; --jidoka:#3a7d6b; --inv:#7a5aa0;
+  --std:#5a6472; --stab:#3d4652;
+  --shadow:0 1px 2px rgba(28,25,20,.06), 0 8px 24px -12px rgba(28,25,20,.18);
+  --radius:10px;
+  --font:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --surface:#1e2024; --surface-2:#232529;
+    --ink:#eceef1; --ink-2:#b9bec6; --muted:#878d97;
+    --line:#31353b; --line-2:#3f444c;
+    --mal:#e0905f; --jit:#6aa8d8; --jidoka:#6fb69f; --inv:#ac8bd2;
+    --std:#9aa4b2; --stab:#8792a1;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font);
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+
+/* ---------- Topp ---------- */
+header.top{margin-bottom:26px}
+.eyebrow{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.15;margin:.25em 0 .3em;letter-spacing:-.02em}
+.lede{color:var(--ink-2);max-width:62ch;margin:0}
+
+/* ---------- Kontrollpanel ---------- */
+.controls{
+  display:flex;flex-wrap:wrap;gap:18px 26px;align-items:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 18px;margin:24px 0 30px;box-shadow:var(--shadow);
+}
+.ctrl-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600;display:block;margin-bottom:6px}
+.slider-block{flex:1 1 320px;min-width:260px}
+.slider-row{display:flex;align-items:center;gap:12px}
+input[type=range]{flex:1;accent-color:var(--mal);height:22px}
+.week-badge{
+  font-variant-numeric:tabular-nums;font-weight:700;font-size:.95rem;
+  background:var(--mal);color:#fff;border-radius:999px;padding:3px 12px;white-space:nowrap;
+}
+.toggle{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--ink-2);cursor:pointer;user-select:none}
+.toggle input{width:16px;height:16px;accent-color:var(--mal);cursor:pointer}
+.status{font-size:.86rem;color:var(--muted);flex:1 1 100%;margin:0;border-top:1px dashed var(--line);padding-top:12px}
+
+/* ---------- Huset ---------- */
+.house{display:flex;flex-direction:column;gap:10px;margin-bottom:34px}
+.gable{width:100%;display:block;height:46px}
+.block{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;box-shadow:var(--shadow);position:relative;
+}
+.block::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:var(--radius) 0 0 var(--radius);background:var(--c,var(--line-2))}
+.block-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.block-title{
+  font-size:1.02rem;font-weight:700;letter-spacing:-.01em;color:var(--c,var(--ink));
+  background:none;border:0;padding:0;font-family:inherit;cursor:pointer;text-align:left;
+}
+.block-title:hover,.block-title:focus-visible{text-decoration:underline;text-underline-offset:3px;outline:none}
+.block-sub{font-size:.84rem;color:var(--muted)}
+.goal-text{margin:0 0 12px;color:var(--ink-2);font-size:.95rem;max-width:58ch}
+.goal-text b{color:var(--ink)}
+
+.mid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:stretch}
+@media (max-width:760px){.mid{grid-template-columns:1fr}}
+
+/* ---------- Felt (chips) ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  font:inherit;font-size:.86rem;line-height:1.25;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);
+  border-radius:7px;padding:6px 11px;cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.chip:hover{transform:translateY(-1px);box-shadow:0 3px 10px -4px rgba(0,0,0,.3);background:var(--surface)}
+.chip:focus-visible{outline:2px solid var(--c,var(--mal));outline-offset:2px}
+.chip .wk{font-size:.7rem;font-variant-numeric:tabular-nums;color:#fff;background:var(--c,var(--muted));border-radius:999px;padding:1px 7px;font-weight:700}
+.chip.new{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+.chip.locked{
+  border-style:dashed;background:transparent;color:var(--muted);cursor:default;
+  font-variant-numeric:tabular-nums;
+}
+.chip.locked:hover{transform:none;box-shadow:none;background:transparent}
+.chip.peek{opacity:.55;font-style:italic;cursor:pointer}
+.chip .star{color:var(--mal);font-weight:700}
+
+.legend{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 20px;margin-bottom:10px}
+
+/* ---------- Underside ---------- */
+.page{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px clamp(18px,4vw,40px);box-shadow:var(--shadow)}
+.back{
+  font:inherit;font-size:.88rem;background:none;border:0;color:var(--ink-2);
+  cursor:pointer;padding:0;margin-bottom:20px;display:inline-flex;gap:7px;align-items:center;
+}
+.back:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.page h2{font-size:clamp(1.5rem,3.6vw,2.1rem);margin:.1em 0 .1em;letter-spacing:-.02em;line-height:1.15}
+.page .kicker{font-size:.75rem;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--c,var(--mal))}
+.page .kort{font-size:1.05rem;color:var(--ink-2);max-width:60ch;margin:.5em 0 1.5em}
+.page h3{font-size:1.05rem;margin:1.9em 0 .5em;letter-spacing:-.01em}
+.page p,.page li{max-width:68ch}
+.page ul,.page ol{padding-left:1.25em}
+.page li{margin:.3em 0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.tag{font-size:.78rem;border:1px solid var(--line-2);border-radius:999px;padding:3px 11px;color:var(--ink-2);background:var(--surface-2)}
+.tag.wk{background:var(--c,var(--mal));color:#fff;border-color:transparent;font-weight:600}
+.callout{
+  border-left:3px solid var(--c,var(--mal));background:var(--surface-2);
+  padding:12px 16px;border-radius:0 8px 8px 0;margin:1.4em 0;font-size:.95rem;color:var(--ink-2);
+}
+.callout b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.92rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.refs{margin-top:2.4em;padding-top:16px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.refs ol{padding-left:1.4em;margin:.4em 0 0}
+.refs li{margin:.35em 0}
+.hidden{display:none}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">PRO-2804 · LEAN produksjon · UiT Narvik · Høst 2026</div>
+  <h1>Leanhuset</h1>
+  <p class="lede">Huset bygges opp gjennom semesteret. Rammen står fra første uke; hvert felt fylles inn den uka temaet undervises. Klikk på et felt for å lese om det.</p>
+</header>
+
+<!-- ===== HOVEDVISNING ===== -->
+<main id="view-house">
+
+  <div class="controls">
+    <div class="slider-block">
+      <span class="ctrl-label">Semesteruke</span>
+      <div class="slider-row">
+        <input type="range" id="weekSlider" min="34" max="46" step="1" value="36" aria-label="Velg semesteruke">
+        <span class="week-badge" id="weekBadge">Uke 36</span>
+      </div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="peekToggle"> Faglærervisning (vis kommende felt)</label>
+    <p class="status" id="statusLine"></p>
+  </div>
+
+  <div class="legend">
+    <span>Stiplet felt = ikke undervist ennå</span>
+    <span><span class="star">*</span> = tillegg i PRO-2804, ikke i bokas figur 2.5</span>
+    <span>Samme aktivitet kan stå flere steder i huset — det er poenget</span>
+  </div>
+
+  <div class="house" id="house"></div>
+
+  <p class="status" style="border:0;padding:0;max-width:70ch">
+    Figuren følger Dennis, <i>Lean Production Simplified</i>, 3. utg., figur 2.4 (rammen) og figur 2.5 (aktivitetene) [1].
+  </p>
+</main>
+
+<!-- ===== UNDERSIDE ===== -->
+<main id="view-page" class="page hidden" tabindex="-1"></main>
+
+<footer>
+  PRO-2804 LEAN produksjon · Espen Johannessen, førstelektor, Institutt for industriell teknologi, UiT Norges arktiske universitet.
+</footer>
+</div>
+
+<script>
+/* =======================================================================
+   DATA
+   Endre "uke" for å flytte når et felt dukker opp. Uke 34 = alltid synlig
+   fra semesterstart. Feltene med stjerne (star:true) er tillegg i emnet
+   og står ikke i bokas figur 2.5.
+   ======================================================================= */
+
+const SEKSJONER = [
+  {id:'mal',   navn:'Mål — Kundefokus',  farge:'var(--mal)',    plass:'tak'},
+  {id:'jit',   navn:'Just-in-Time',      farge:'var(--jit)',    plass:'soyle-v'},
+  {id:'inv',   navn:'Involvering',       farge:'var(--inv)',    plass:'hjerte'},
+  {id:'jidoka',navn:'Jidoka',            farge:'var(--jidoka)', plass:'soyle-h'},
+  {id:'std',   navn:'Standardisering',   farge:'var(--std)',    plass:'bjelke'},
+  {id:'stab',  navn:'Stabilitet',        farge:'var(--stab)',   plass:'grunnmur'}
+];
+
+/* Hvert element kan stå i flere seksjoner — akkurat som i figur 2.5. */
+const ELEMENTER = [
+  /* ---- UKE 34 ---- */
+  {id:'muda', navn:'Muda (sløsing)', uke:34, i:['mal'],
+   kort:'Alt som forbruker ressurser uten å skape verdi for kunden.'},
+
+  /* ---- UKE 35 ---- */
+  {id:'a3', navn:'A3-tenkning', uke:35, i:['mal','std'],
+   kort:'Hele problemløsningen på ett ark, i faste bokser.'},
+  {id:'pdca', navn:'PDCA', uke:35, i:['std'], star:true,
+   kort:'Forbedringssyklusen som A3-arket er bygd på.'},
+
+  /* ---- UKE 36 ---- */
+  {id:'femS', navn:'Visuell orden (5S)', uke:36, i:['jit','jidoka','inv','std','stab'],
+   kort:'Fem trinn som gjør arbeidsplassen selvforklarende.'},
+  {id:'visuell', navn:'Visuell ledelse', uke:36, i:['std'], star:true,
+   kort:'Normaltilstand og avvik synlig med det samme, uten at noen må spørre.'},
+
+  /* ---- PLANLAGT VIDERE (juster ukene ved behov) ---- */
+  {id:'tpm', navn:'TPM', uke:37, i:['inv','stab'],
+   kort:'Totalt produktivt vedlikehold — maskinens stabilitet er operatørens ansvar.'},
+  {id:'flyt', navn:'Flyt', uke:38, i:['jit'],
+   kort:'Én enhet av gangen gjennom prosessen, uten mellomlager.'},
+  {id:'robust', navn:'Robust prosess', uke:38, i:['jit'],
+   kort:'En prosess som tåler variasjon uten å stoppe flyten.'},
+  {id:'takt', navn:'Takttid', uke:39, i:['jit','mal'],
+   kort:'Kundens etterspørsel omregnet til produksjonstakt.'},
+  {id:'trekk', navn:'Trekksystem', uke:39, i:['jit'],
+   kort:'Ingenting produseres før neste ledd faktisk henter det.'},
+  {id:'kanban', navn:'Kanban', uke:40, i:['jit','std','stab'],
+   kort:'Signalet som utløser produksjon i et trekksystem.'},
+  {id:'stdarbeid', navn:'Standardisert arbeid', uke:40, i:['inv','std','stab'],
+   kort:'Gjeldende beste kjente måte — utgangspunktet for all forbedring.'},
+  {id:'heijunka', navn:'Heijunka', uke:41, i:['jit','mal','stab'],
+   kort:'Utjevning av volum og variantmiks over tid.'},
+  {id:'leandesign', navn:'Lean design', uke:42, i:['mal'],
+   kort:'Produktet designes for enkel og feilfri produksjon (DFMA).'},
+  {id:'jidoka-akt', navn:'Jidoka (som aktivitet)', uke:43, i:['stab'],
+   kort:'Stopp ved avvik — feilen får ikke gå videre.'},
+  {id:'poka', navn:'Poka-yoke', uke:43, i:['jidoka'],
+   kort:'Feilsikring: gjør feilhandlingen fysisk umulig.'},
+  {id:'sone', navn:'Sonekontroll', uke:43, i:['jidoka'],
+   kort:'Avviket fanges innenfor sin egen sone, ikke hos kunden.'},
+  {id:'problem', navn:'Problemløsning', uke:43, i:['jidoka'],
+   kort:'Systematisk jakt på rotårsak, ikke på symptom.'},
+  {id:'avvik', navn:'Avvikskontroll', uke:43, i:['jidoka'],
+   kort:'Definert normaltilstand, definert respons når den brytes.'},
+  {id:'menneske', navn:'Skille menneske- og maskinarbeid', uke:43, i:['jidoka'],
+   kort:'Mennesket skal ikke stå og se på at maskinen går.'},
+  {id:'involvering-akt', navn:'Involvering', uke:44, i:['jit','jidoka','mal'],
+   kort:'Uten folk som vil, er verktøyene tomme skall.'},
+  {id:'kaizen', navn:'Kaizen-sirkler', uke:44, i:['inv'],
+   kort:'Små, faste grupper som forbedrer sitt eget arbeid.'},
+  {id:'forslag', navn:'Forbedringsforslag', uke:44, i:['inv'],
+   kort:'Systemet som gjør at et forslag faktisk blir til noe.'},
+  {id:'sikkerhet', navn:'Sikkerhetsaktiviteter', uke:44, i:['inv'],
+   kort:'Sikkerhet er ikke et tillegg til Lean — det er inngangen.'},
+  {id:'hoshin', navn:'Hoshin-planlegging', uke:45, i:['inv','std','mal'],
+   kort:'Strategien brytes ned til noe hver enkelt kan handle på.'}
+];
+
+/* =======================================================================
+   INNHOLD PÅ UNDERSIDENE
+   ======================================================================= */
+
+const R = {
+  dennis:'P. Dennis, <i>Lean Production Simplified: A Plain-Language Guide to the World\'s Most Powerful Production System</i>, 3. utg. Boca Raton, FL, USA: CRC Press, 2016.',
+  ohno:'T. Ohno, <i>Toyota Production System: Beyond Large-Scale Production</i>. Cambridge, MA, USA: Productivity Press, 1988.',
+  sobek:'D. K. Sobek II og A. Smalley, <i>Understanding A3 Thinking: A Critical Component of Toyota\'s PDCA Management System</i>. New York, NY, USA: Productivity Press, 2008.',
+  deming:'W. E. Deming, <i>Out of the Crisis</i>. Cambridge, MA, USA: MIT Press, 1986.',
+  hirano:'H. Hirano, <i>5 Pillars of the Visual Workplace: The Sourcebook for 5S Implementation</i>. Portland, OR, USA: Productivity Press, 1995.',
+  rother:'M. Rother og J. Shook, <i>Learning to See: Value Stream Mapping to Add Value and Eliminate Muda</i>, v. 1.4. Cambridge, MA, USA: Lean Enterprise Institute, 2009.',
+  liker:'J. K. Liker, <i>The Toyota Way: 14 Management Principles from the World\'s Greatest Manufacturer</i>. New York, NY, USA: McGraw-Hill, 2004.'
+};
+
+const INNHOLD = {
+
+/* ---------------- STRUKTUR ---------------- */
+
+mal:{ref:['dennis','ohno'], html:`
+<p>Taket i Leanhuset er <b>målet</b>, og målet er definert fra kundens side, ikke fra bedriftens: <b>høyeste kvalitet, laveste kostnad og korteste ledetid</b> — oppnådd gjennom kontinuerlig eliminering av muda (sløsing) [1].</p>
+
+<h3>Hvorfor de tre ikke er i konflikt</h3>
+<p>I tradisjonell produksjonstenkning er dette et valg: du kan få det billig, godt eller raskt — velg to. Lean-logikken avviser den avveiningen, men bare under én betingelse: forbedringen skal komme fra å <i>fjerne sløsing</i>, ikke fra å presse mennesker eller kutte i kvalitetsarbeidet. Fjerner du ventetid, omarbeid og unødvendig transport, blir prosessen samtidig raskere, billigere og bedre. Presser du derimot takten på en prosess som fortsatt er full av sløsing, får du bare mer sløsing per time.</p>
+
+<div class="callout"><b>Merk formuleringen «kontinuerlig».</b> Målet er ikke en tilstand du når og så er ferdig med. Det er en retning. Et Lean-system som slutter å forbedre seg, forfaller — det er selve begrunnelsen for kaizen (forbedring i små steg).</div>
+
+<h3>Hva som holder taket oppe</h3>
+<p>Taket hviler på to søyler — <b>just-in-time</b> og <b>jidoka</b> — med <b>involvering</b> som hjerte og <b>standardisering</b> og <b>stabilitet</b> som grunnmur. Rekkefølgen er ikke tilfeldig: du kan ikke bygge taket først. Et forbedringstiltak som treffer taket direkte, uten å gå veien om grunnmuren, holder sjelden mer enn noen uker.</p>
+
+<h3>I dette emnet</h3>
+<p>De tre måltallene i taket er nøyaktig de tre dere måler i Lean-simuleringen på samlingen: kvalitet (andel godkjente fly), kostnad (ressursbruk per enhet) og ledetid (tid fra bestilling til levert fly). Runde 1 gir baseline. Alt dere gjør i runde 2–6 skal kunne begrunnes med hvordan det flytter minst ett av disse tre uten å ødelegge de andre.</p>
+`},
+
+jit:{ref:['dennis','ohno','rother'], html:`
+<p><b>Just-in-Time (JIT)</b> er venstre søyle i huset: å produsere og levere <b>rett del, i rett antall, til rett tid</b> — verken før eller etter [1], [2].</p>
+
+<h3>Tre deler som må stå sammen</h3>
+<table>
+<tr><th>Element</th><th>Spørsmål det svarer på</th></tr>
+<tr><td><b>Flyt</b></td><td>Beveger enheten seg kontinuerlig, eller står den i kø?</td></tr>
+<tr><td><b>Takttid</b></td><td>Hvor fort må vi produsere for å møte kunden — ikke fortere, ikke saktere?</td></tr>
+<tr><td><b>Trekksystem</b></td><td>Hvem bestemmer at noe skal lages: en plan, eller neste ledd som faktisk trenger det?</td></tr>
+</table>
+
+<div class="callout"><b>Vanlig misforståelse:</b> at JIT betyr «minst mulig lager». Lagerreduksjon er en <i>konsekvens</i>, ikke målet. Poenget er at lager skjuler problemer. Ohno beskrev det som å senke vannstanden i en elv: steinene — maskinstopp, kvalitetsfeil, lange omstillingstider — kommer til syne først når lageret ikke lenger dekker over dem [2]. Senker du vannstanden uten å ville se på steinene, får du bare havari.</div>
+
+<h3>Hvorfor søylen alene ikke bærer</h3>
+<p>JIT uten jidoka er skjørt. I en prosess uten lager stopper alt når én feil oppstår, og hvis feilen ikke oppdages med det samme, går den rett videre til kunden. Derfor er de to søylene et par: JIT gjør systemet raskt, jidoka gjør det trygt å være rask.</p>
+
+<h3>I dette emnet</h3>
+<p>JIT introduseres fra uke 38 og eies av simuleringens segment 2. I runde 1 kjører dere med store mellomlagre — det gir høy tilsynelatende produktivitet ved hver stasjon og forferdelig ledetid. Sammenlign de tallene med runde 3–4 når flyten er strammet inn.</p>
+`},
+
+jidoka:{ref:['dennis','ohno','liker'], html:`
+<p><b>Jidoka</b> er høyre søyle. Ordet oversettes vanligvis som «automatisering med et menneskelig sinn» eller <b>innebygd kvalitet</b>. Prinsippet er enkelt og radikalt: <b>når noe unormalt skjer, stopper prosessen — feilen får ikke gå videre</b> [1], [2].</p>
+
+<h3>Opprinnelsen</h3>
+<p>Sakichi Toyoda bygde i 1896 en vevstol som stoppet av seg selv når en tråd røk. Effekten var ikke først og fremst bedre kvalitet, men noe annet: én operatør kunne nå passe mange maskiner i stedet for å stå og se på én. Kvalitet og produktivitet ble løst av samme grep [7].</p>
+
+<h3>Fire ting jidoka gjør</h3>
+<ol>
+<li><b>Oppdager avviket</b> — automatisk der det er mulig, ved definert normaltilstand der det ikke er det.</li>
+<li><b>Stopper</b> — linja, stasjonen eller sonen. Ikke fortsett og fiks senere.</li>
+<li><b>Varsler</b> — andon-signal, synlig for alle.</li>
+<li><b>Finner rotårsak</b> — så det samme avviket ikke skjer igjen.</li>
+</ol>
+
+<div class="callout"><b>Det kontraintuitive:</b> jidoka gir en organisasjon som stopper oftere, men står stille kortere. Å la et problem løpe koster mer enn å stanse for det, fordi kostnaden ved en feil vokser jo lenger ned i verdikjeden den oppdages.</div>
+
+<h3>I dette emnet</h3>
+<p>Jidoka er lagt til <i>etter</i> samlingen, i uke 43, og det er et bevisst valg. Dere skal først møte kvalitetsproblemet selv i simuleringens segment 3 — når feil fly kommer helt fram til kunden — slik at jidoka blir svaret på noe dere har erfart, ikke et begrep dere har fått utdelt på forhånd.</p>
+`},
+
+inv:{ref:['dennis','liker'], html:`
+<p><b>Involvering</b> står i midten av huset, og det er ikke en tilfeldig plassering. Dennis beskriver det som systemets hjerte: <b>fleksible, motiverte teammedlemmer som kontinuerlig søker en bedre måte</b> [1].</p>
+
+<h3>Hvorfor midten</h3>
+<p>Alt annet i huset er verktøy. 5S, kanban, poka-yoke og standardisert arbeid gjør ingenting av seg selv — de virker bare i den grad menneskene som bruker dem, faktisk vil at de skal virke. Det er den mest dokumenterte feilkilden i Lean-innføringer: verktøyene kopieres, involveringen kopieres ikke, og resultatet er en organisasjon med fargede gulvmerker og uendret ytelse [1], [6].</p>
+
+<div class="callout"><b>Kjernetesten:</b> hvem har lov til å endre standarden? Er svaret «ingeniøravdelingen», har du verktøy uten involvering. Er svaret «operatøren, gjennom en definert prosess», har du et Lean-system.</div>
+
+<h3>Aktivitetene i denne søylen</h3>
+<p>Standardisert arbeid, 5S, TPM, kaizen-sirkler, forbedringsforslag, sikkerhetsaktiviteter og hoshin-planlegging. Legg merke til at flere av dem også står andre steder i huset — de er både verktøy og arena for involvering.</p>
+
+<h3>I dette emnet</h3>
+<p>Involvering undervises i uke 44, men praktiseres fra uke 34. Rollerotasjonen mellom simuleringsrundene, det roterende oppsummeringsansvaret i kjerneøktene og CATME-vurderingen av teamarbeid er alle operasjonaliseringer av dette prinsippet — ikke pedagogisk pynt.</p>
+`},
+
+std:{ref:['dennis','ohno','sobek'], html:`
+<p><b>Standardisering</b> er den øvre delen av grunnmuren. En standard er <b>den beste kjente måten å gjøre arbeidet på akkurat nå</b> — dokumentert, delt og etterlevd [1].</p>
+
+<h3>Ohnos setning</h3>
+<div class="callout">«Uten standard, ingen kaizen.» Poenget: forbedring krever et sammenligningsgrunnlag. Hvis alle gjør oppgaven på sin egen måte, kan du ikke vite om en endring gjorde noe bedre eller om du bare målte en annen person [2].</div>
+
+<h3>Standard er ikke det samme som byråkrati</h3>
+<table>
+<tr><th>Standard i Lean</th><th>Prosedyre som byråkrati</th></tr>
+<tr><td>Skrevet av dem som gjør arbeidet</td><td>Skrevet av noen andre</td></tr>
+<tr><td>Endres så snart en bedre måte er vist</td><td>Endres ved neste revisjonsrunde</td></tr>
+<tr><td>Er grunnlag for forbedring</td><td>Er et krav som skal etterleves</td></tr>
+<tr><td>Kort nok til å bli lest</td><td>Fullstendig nok til å dekke ansvar</td></tr>
+</table>
+
+<h3>Hva som står i denne bjelken</h3>
+<p>Standardisert arbeid, kanban, A3-tenkning, visuell orden (5S) og hoshin-planlegging. Fellesnevneren er at de alle gjør noe <i>eksplisitt</i> som ellers ville ligget i hodet på enkeltpersoner: arbeidsrekkefølgen, produksjonssignalet, problemløsningen, plasseringen av utstyr, prioriteringen.</p>
+
+<h3>I dette emnet</h3>
+<p>A3 og PDCA er flyttet fram til uke 35 nettopp fordi de er emnets <i>arbeidsformat</i> — dere standardiserer måten dere jobber med problemer på, før dere begynner å jobbe med problemer.</p>
+`},
+
+stab:{ref:['dennis','hirano'], html:`
+<p><b>Stabilitet</b> er nederste laget — det alt annet står på. Et stabilt system er et system der <b>det samme arbeidet, utført på samme måte, gir omtrent samme resultat hver gang</b> [1].</p>
+
+<h3>De fire M-ene</h3>
+<table>
+<tr><th>M</th><th>Betyr</th><th>Ustabilt når</th></tr>
+<tr><td><b>Menneske</b> (Man)</td><td>Kompetanse, tilgjengelighet, opplæring</td><td>Resultatet avhenger av hvem som er på vakt</td></tr>
+<tr><td><b>Maskin</b> (Machine)</td><td>Utstyrets tilgjengelighet og presisjon</td><td>Uplanlagte stopp, drift i kvalitet</td></tr>
+<tr><td><b>Materiale</b> (Material)</td><td>Riktig materiale, riktig tid, riktig kvalitet</td><td>Mangler, feil varer, varierende råvare</td></tr>
+<tr><td><b>Metode</b> (Method)</td><td>Arbeidsmåten</td><td>Alle gjør det litt forskjellig</td></tr>
+</table>
+
+<div class="callout"><b>Hvorfor dette er nederst:</b> på en ustabil base er alle målinger støy. Du innfører et tiltak, tallet går ned, og du vet ikke om det var tiltaket eller om det bare var en litt bedre dag. Forbedringsarbeid på ustabil grunn er gjetting med dokumentasjon.</div>
+
+<h3>Aktivitetene som skaper stabilitet</h3>
+<p>Standardisert arbeid, 5S, jidoka, TPM, heijunka og kanban. De to første er de billigste og virker raskest — derfor starter emnet der, i uke 36.</p>
+
+<h3>I dette emnet</h3>
+<p>I simuleringen vil runde 1 være ustabil på alle fire M-ene samtidig. Del av jobben deres er å beskrive <i>hvilken</i> M som svikter hvor, i stedet for å konkludere med at «det var kaos». Presist språk om ustabilitet er selve forutsetningen for å velge riktig tiltak.</p>
+`},
+
+/* ---------------- UKE 34 ---------------- */
+
+muda:{ref:['ohno','dennis','rother'], html:`
+<p><b>Muda</b> (無駄) er japansk for sløsing: <b>enhver aktivitet som forbruker ressurser uten å skape verdi for kunden</b>. Å eliminere muda kontinuerlig er selve mekanismen taket i Leanhuset hviler på [1], [2].</p>
+
+<h3>Verditesten</h3>
+<p>En aktivitet skaper verdi bare hvis alle tre er oppfylt:</p>
+<ol>
+<li>Den <b>endrer</b> produktet eller tjenesten i retning av det kunden vil ha.</li>
+<li>Kunden <b>ville betalt</b> for den hvis han så den.</li>
+<li>Den gjøres <b>riktig første gang</b>.</li>
+</ol>
+<p>I typiske prosesser er under 10 % av gjennomløpstiden verdiskapende. Resten er muda — men merk: noe muda er <i>nødvendig</i> med dagens teknologi og lovverk (kvalitetskontroll, dokumentasjonskrav). Skillet mellom <b>nødvendig</b> og <b>ren</b> muda avgjør hva du angriper først.</p>
+
+<h3>De åtte typene</h3>
+<table>
+<tr><th>Type</th><th>Kjennetegn</th><th>Eksempel</th></tr>
+<tr><td><b>Overproduksjon</b></td><td>Lager mer eller tidligere enn nødvendig</td><td>Fem fly ferdig før kunden bestilte to</td></tr>
+<tr><td><b>Venting</b></td><td>Menneske eller enhet står stille</td><td>Montør venter på deler fra forrige stasjon</td></tr>
+<tr><td><b>Transport</b></td><td>Flytting av materiale uten bearbeiding</td><td>Deler fraktes mellom bord tre ganger</td></tr>
+<tr><td><b>Overprosessering</b></td><td>Mer arbeid enn kunden har bruk for</td><td>Toleranser strammere enn spesifikasjonen krever</td></tr>
+<tr><td><b>Lager</b></td><td>Materiale som venter</td><td>Halvferdige fly i haug ved stasjon 3</td></tr>
+<tr><td><b>Bevegelse</b></td><td>Unødvendig bevegelse hos mennesket</td><td>Leter etter verktøy i skuffen</td></tr>
+<tr><td><b>Feil og omarbeid</b></td><td>Noe må gjøres om igjen</td><td>Fly avvist av kunden, bygges på nytt</td></tr>
+<tr><td><b>Ubrukt kompetanse</b></td><td>Folks kunnskap tas ikke i bruk</td><td>Operatøren så feilen, men ble ikke spurt</td></tr>
+</table>
+<p>De sju første er Ohnos opprinnelige liste [2]. Den åttende kom til senere og er den som oftest utelates — og den som knytter muda direkte til <b>involvering</b> i midten av huset.</p>
+
+<h3>Muda, mura og muri</h3>
+<div class="callout">
+<b>Muda</b> = sløsing · <b>Mura</b> = ujevnhet · <b>Muri</b> = overbelastning.<br><br>
+De tre henger sammen, og rekkefølgen er viktig: <b>muda er ofte et symptom</b>. Ujevn etterspørsel (mura) skaper vekselvis venting og overbelastning (muri), og begge deler produserer sløsing (muda). Jakter du bare på muda, fjerner du symptomet og lar årsaken stå. Det er derfor heijunka — utjevning — hører hjemme i JIT-søylen.
+</div>
+
+<h3>I dette emnet</h3>
+<p>Uke 34 åpnet induktivt: dere laget deres egen usorterte liste over «hvor tiden går» <i>før</i> dere fikk begrepene. Det var med hensikt. Vokabularet over er verdiløst hvis du ikke allerede har noe å bruke det på. AK1 (Sløsingskartlegging) bygger direkte videre på den lista, på deres egen arbeidsplass.</p>
+`},
+
+/* ---------------- UKE 35 ---------------- */
+
+a3:{ref:['sobek','dennis','deming'], html:`
+<p><b>A3-tenkning</b> er å presse hele problemløsningen — bakgrunn, nåsituasjon, mål, årsaksanalyse, mottiltak, plan og oppfølging — ned på <b>ett ark i A3-format</b>, i faste bokser [3].</p>
+
+<h3>Den bærende innsikten</h3>
+<div class="callout"><b>A3-arket er PDCA gjort synlig.</b> Venstre side av arket er <i>Plan</i>: hva er problemet, hvor stort er det, hva er årsaken. Høyre side er <i>Do–Check–Act</i>: hva gjør vi, virket det, hva nå. Kan du ikke plassere en boks på arket i én av de fire fasene, hører den sannsynligvis ikke hjemme der.</div>
+
+<h3>Boksene</h3>
+<table>
+<tr><th>Boks</th><th>Krav</th></tr>
+<tr><td>Bakgrunn</td><td>Hvorfor er dette verdt å bruke tid på — for hvem?</td></tr>
+<tr><td>Nåsituasjon</td><td><b>Tall, ikke adjektiver.</b> «Lang ventetid» er ikke en nåsituasjon; «gjennomsnittlig 7,5 min, målt over 40 kunder» er</td></tr>
+<tr><td>Mål</td><td>Målbart og datert</td></tr>
+<tr><td>Årsaksanalyse</td><td>Rotårsak, ikke skyld. Fem ganger «hvorfor»</td></tr>
+<tr><td>Mottiltak</td><td>Knyttet til rotårsaken, ikke til symptomet</td></tr>
+<tr><td>Plan</td><td>Hvem gjør hva, når</td></tr>
+<tr><td>Oppfølging</td><td>Når og hvordan sjekkes effekten</td></tr>
+</table>
+
+<h3>Hvorfor begrensningen er poenget</h3>
+<p>Ett ark er ikke et formkrav — det er en tvang som gjør noe med tenkningen. Når plassen er fast, må du velge hva som er viktig, og du kan ikke skjule svak analyse bak volum. Det er også grunnen til at A3 er et av emnets to sterkeste KI-ankre: et generert A3 med velformulerte, generelle setninger avslører seg umiddelbart i nåsituasjonsboksen, der det skal stå tall som er målt av noen.</p>
+
+<h3>I dette emnet</h3>
+<p>A3 er <b>prosjektets arbeidsformat</b>, ikke et enkelttema. Det ble derfor undervist deduktivt i uke 35 — et format du skal bruke i tolv uker, skal gis presist og tidlig, ikke rekonstrueres. C-kriteriet i prosjektrubrikken krever eksplisitt at A3-formatet er brukt riktig.</p>
+`},
+
+pdca:{ref:['deming','sobek','dennis'], html:`
+<p><b>PDCA</b> — Plan, Do, Check, Act — er forbedringssyklusen som all kaizen bygger på. Deming brukte selv formen <b>PDSA</b>, der <i>Study</i> erstatter <i>Check</i>, fordi «check» kan forstås som avkryssing snarere enn analyse [4].</p>
+
+<table>
+<tr><th>Fase</th><th>Innhold</th><th>Vanlig feil</th></tr>
+<tr><td><b>Plan</b></td><td>Mål, nåsituasjon, hypotese</td><td>Hopper rett til tiltak uten hypotese</td></tr>
+<tr><td><b>Do</b></td><td>Gjennomfør i liten skala, dokumenter</td><td>Innfører i full skala med én gang</td></tr>
+<tr><td><b>Check / Study</b></td><td>Analyser data mot hypotesen</td><td>Spør «gikk det bra?» i stedet for å måle</td></tr>
+<tr><td><b>Act</b></td><td>Standardiser, forkast, eller ny syklus</td><td>Går videre uten å standardisere det som virket</td></tr>
+</table>
+
+<div class="callout"><b>Regelen fra uke 35:</b> en PDCA-syklus uten et <b>måltall</b> er ikke en syklus — det er et ønske. Hvis du ikke på forhånd kan si hvilket ett tall som avgjør om hypotesen holdt, har du ingen Check-fase, og dermed heller ingen syklus.</div>
+
+<h3>Hvorfor små sykluser</h3>
+<p>Forbedring skjer som mange raske runder, ikke som ett stort prosjekt. En liten syklus som feiler, koster lite og lærer mye; et stort prosjekt som feiler, koster mye og lærer sjelden noe, fordi for mange ting ble endret samtidig til at noen kan si hva som virket.</p>
+
+<h3>Plassering i huset</h3>
+<p>PDCA står ikke som eget felt i Dennis' figur 2.5 — det ligger implisitt i A3-tenkning og i kaizen. Feltet er tatt med her fordi PDCA er dette emnets eksplisitte arbeidsformat, og fordi AK2 i uke 40 krever at dere leverer én kaizen-hypotese formulert som en PDCA-syklus.</p>
+`},
+
+/* ---------------- UKE 36 ---------------- */
+
+femS:{ref:['hirano','dennis','ohno'], html:`
+<p><b>5S</b> er fem sekvensielle trinn som gjør arbeidsplassen ordnet, selvforklarende og stabil. Dennis bruker betegnelsen <b>visuell orden</b> for å understreke at målet ikke er ryddighet, men at <b>avvik skal være synlige</b> [1], [5].</p>
+
+<h3>De fem trinnene</h3>
+<table>
+<tr><th>Trinn</th><th>Japansk</th><th>Handling</th><th>Testen</th></tr>
+<tr><td><b>1. Sortere</b></td><td>Seiri</td><td>Fjern alt som ikke brukes i arbeidet</td><td>Har dette vært brukt siste 30 dager?</td></tr>
+<tr><td><b>2. Systematisere</b></td><td>Seiton</td><td>Fast plass til det som blir igjen, merket</td><td>Ser en fremmed hvor tingen hører hjemme?</td></tr>
+<tr><td><b>3. Skinne</b></td><td>Seiso</td><td>Rengjør — og finn feilkilden mens du gjør det</td><td>Vet du <i>hvorfor</i> det ble skittent?</td></tr>
+<tr><td><b>4. Standardisere</b></td><td>Seiketsu</td><td>Gjør trinn 1–3 til en definert rutine</td><td>Skjer dette uten at noen minner om det?</td></tr>
+<tr><td><b>5. Sikre</b></td><td>Shitsuke</td><td>Etterlev og revider over tid</td><td>Holder det seg etter tre måneder?</td></tr>
+</table>
+
+<div class="callout"><b>Der de fleste 5S-innføringer havarerer:</b> mellom trinn 3 og 4. Trinn 1–3 er en ryddedag — synlig, tilfredsstillende og fort gjort. Trinn 4–5 er systemarbeid uten umiddelbar belønning. Et engangsopprydd <i>uten</i> trinn 4 og 5 er ikke 5S; det er en dugnad, og arbeidsplassen ser lik ut igjen om seks uker.</div>
+
+<h3>To presiseringer fra uke 36</h3>
+<ul>
+<li><b>«Kast alt» er ikke sortering</b> — det er panikk. Sortering forutsetter et kriterium (brukshyppighet), ikke en impuls.</li>
+<li><b>Sortere og standardisere forveksles lett.</b> Sortere er en handling på gjenstander. Standardisere er en handling på <i>rutinen</i>. Klarer du ikke å si hvilken av de to et tiltak er, er tiltaket sannsynligvis for vagt til å gjennomføres.</li>
+</ul>
+
+<h3>Hvorfor 5S står fem steder i huset</h3>
+<p>Legg merke til at visuell orden dukker opp i JIT-søylen, i jidoka-søylen, i involvering, i standardisering <i>og</i> i stabilitet. Det er ikke rot i figuren — det er 5S' faktiske rolle. Ordnet arbeidsplass gir flyt (JIT), gjør avvik synlige (jidoka), utføres av teamet selv (involvering), krever en rutine (standardisering) og reduserer variasjon (stabilitet). Få aktiviteter gir like mye for like lite.</p>
+
+<h3>I dette emnet</h3>
+<p>Åpningen i uke 36 var induktiv — bildepar av rotete og ryddig arbeidsstasjon, før begrepene. Det var mulig fordi 5S har lav elementinteraktivitet: fem konkrete steg i rekkefølge, ikke noe som må holdes i hodet samtidig. På samlingen kommer leverandørbordene i runde 1 garantert til å være rotete. Det er poenget med en baseline — og 5S er verktøyet som lar dere beskrive <i>nøyaktig</i> hva som er galt med dem.</p>
+`},
+
+visuell:{ref:['hirano','dennis','liker'], html:`
+<p><b>Visuell ledelse</b> (visuell styring) er å gjøre <b>normaltilstand og avvik synlige med det samme</b> — uten at noen må spørre, lete eller rapportere [1], [5].</p>
+
+<h3>Kjernetesten</h3>
+<div class="callout">Et system er stabilt først når <b>et avvik er synlig for alle</b>, ikke bare for den som leter etter det. Still spørsmålet slik: kan en person som kommer inn i rommet og ikke kjenner prosessen, se innen ti sekunder om alt er som det skal?</div>
+
+<h3>Virkemidler</h3>
+<table>
+<tr><th>Virkemiddel</th><th>Gjør synlig</th></tr>
+<tr><td>Fargekoding</td><td>Tilhørighet, status, prioritet</td></tr>
+<tr><td>Skilt og merking av plass</td><td>Hvor noe hører hjemme, og at det mangler</td></tr>
+<tr><td>Andon-signal</td><td>At noe har stoppet, akkurat nå</td></tr>
+<tr><td>Min/maks-merker på lager</td><td>At beholdningen er utenfor normalen</td></tr>
+<tr><td>Statustavle</td><td>Framdrift mot plan, uten møte</td></tr>
+</table>
+
+<h3>Forskjellen fra rapportering</h3>
+<p>En rapport forteller deg hva som var galt i går. Et visuelt signal forteller deg at noe er galt nå. Det er ikke en gradsforskjell — det er forskjellen mellom å korrigere og å dokumentere. Mye av det som kalles «styring» i organisasjoner, er i realiteten etterhåndsdokumentasjon av avvik ingen kunne gripe inn i.</p>
+
+<h3>Arbeidet eksempel: gatekjøkkenet</h3>
+<p>I casen til Hilde og Arild var det gjentatte «hvor lang tid tar det?»-spørsmål fra kunder i kø. Et enkelt sett fargede kort — <i>bestilt / under tilberedning / klar</i> — gjør ventetiden synlig og fjerner spørsmålet. En digital kølapp-app ble vurdert og forkastet: for dyr, og responsen for treg for et gatekjøkken der hele syklusen tar fire minutter. Det forkastede alternativet er en del av eksempelet, ikke en fotnote.</p>
+
+<h3>Plassering i huset</h3>
+<p>Visuell ledelse er ikke et eget felt i figur 2.5 — der ligger det inne i «visuell orden (5S)». Feltet er skilt ut her fordi emnet behandler det som en egen ferdighet: 5S ordner arbeidsplassen, visuell ledelse gjør tilstanden lesbar. På samlingen er leverandørrollen og «fleet»-lageret i segment 3 lettere å styre visuelt enn med lister.</p>
+`}
+};
+
+/* =======================================================================
+   RENDERING
+   ======================================================================= */
+
+const el = id => document.getElementById(id);
+const house = el('house'), slider = el('weekSlider'), badge = el('weekBadge'),
+      peek = el('peekToggle'), statusLine = el('statusLine'),
+      viewHouse = el('view-house'), viewPage = el('view-page');
+
+let uke = 36;
+let forrigeSynlige = new Set();
+
+function farge(sid){ return (SEKSJONER.find(s=>s.id===sid)||{}).farge || 'var(--muted)'; }
+function elementerI(sid){ return ELEMENTER.filter(e=>e.i.includes(sid)).sort((a,b)=>a.uke-b.uke || a.navn.localeCompare(b.navn,'nb')); }
+
+function chipHTML(e, sid, erNy){
+  const laast = e.uke > uke;
+  const stjerne = e.star ? ' <span class="star" title="Tillegg i PRO-2804, ikke i bokas figur 2.5">*</span>' : '';
+  if(laast && !peek.checked){
+    return `<span class="chip locked" title="Introduseres i uke ${e.uke}">Uke ${e.uke}</span>`;
+  }
+  const kl = 'chip' + (laast ? ' peek' : '') + (erNy ? ' new' : '');
+  const wk = laast ? `<span class="wk" style="--c:${farge(sid)}">${e.uke}</span>` : '';
+  return `<button class="${kl}" data-el="${e.id}" style="--c:${farge(sid)}" title="${e.kort.replace(/"/g,'&quot;')}">${e.navn}${stjerne}${wk}</button>`;
+}
+
+function seksjonHTML(sid, ekstra){
+  const s = SEKSJONER.find(x=>x.id===sid);
+  const liste = elementerI(sid);
+  const chips = liste.map(e => chipHTML(e, sid, !forrigeSynlige.has(e.id) && e.uke<=uke && forrigeSynlige.size>0)).join('');
+  return `<div class="block" style="--c:${s.farge}">
+    <div class="block-head">
+      <button class="block-title" data-el="${sid}">${s.navn}</button>
+      <span class="block-sub">${liste.filter(e=>e.uke<=uke).length} av ${liste.length} felt</span>
+    </div>
+    ${ekstra||''}
+    <div class="chips">${chips || '<span class="block-sub">—</span>'}</div>
+  </div>`;
+}
+
+function tegnHus(){
+  const gable = `<svg class="gable" viewBox="0 0 100 12" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="50,0 100,12 0,12" fill="var(--mal)" opacity=".16"></polygon>
+      <polyline points="0,12 50,0 100,12" fill="none" stroke="var(--mal)" stroke-width=".35" opacity=".7"></polyline>
+    </svg>`;
+
+  const maalTekst = `<p class="goal-text"><b>Kundefokus:</b> høyeste kvalitet, laveste kostnad, korteste ledetid — gjennom kontinuerlig eliminering av muda.</p>`;
+
+  house.innerHTML =
+    gable +
+    seksjonHTML('mal', maalTekst) +
+    `<div class="mid">${seksjonHTML('jit')}${seksjonHTML('inv')}${seksjonHTML('jidoka')}</div>` +
+    seksjonHTML('std') +
+    seksjonHTML('stab');
+
+  house.querySelectorAll('[data-el]').forEach(b =>
+    b.addEventListener('click', () => { location.hash = '#/' + b.dataset.el; }));
+
+  const totalt = ELEMENTER.length;
+  const synlige = ELEMENTER.filter(e=>e.uke<=uke).length;
+  const denneUka = ELEMENTER.filter(e=>e.uke===uke);
+  statusLine.textContent =
+    `${synlige} av ${totalt} felt er avdekket. ` +
+    (denneUka.length
+      ? `Nytt i uke ${uke}: ${denneUka.map(e=>e.navn).join(', ')}.`
+      : `Ingen nye felt i uke ${uke}.`);
+
+  forrigeSynlige = new Set(ELEMENTER.filter(e=>e.uke<=uke).map(e=>e.id));
+}
+
+/* ---------- Underside ---------- */
+function visSide(id){
+  const s = SEKSJONER.find(x=>x.id===id);
+  const e = ELEMENTER.find(x=>x.id===id);
+  if(!s && !e){ location.hash=''; return; }
+
+  const navn   = s ? s.navn : e.navn;
+  const c      = s ? s.farge : farge(e.i[0]);
+  const kicker = s ? 'Del av huset' : (e.uke<=uke ? `Undervist uke ${e.uke}` : `Introduseres uke ${e.uke}`);
+  const kort   = e ? e.kort : '';
+
+  let tags = '';
+  if(e){
+    tags += `<span class="tag wk" style="--c:${c}">Uke ${e.uke}</span>`;
+    e.i.forEach(sid => {
+      const ss = SEKSJONER.find(x=>x.id===sid);
+      if(ss) tags += `<span class="tag">${ss.navn}</span>`;
+    });
+    if(e.star) tags += `<span class="tag">Tillegg i PRO-2804</span>`;
+  }
+
+  const data = INNHOLD[id];
+  let body, refs = '';
+  if(data){
+    body = data.html;
+    if(data.ref && data.ref.length){
+      const nummer = {dennis:1, ohno:2, sobek:3, deming:4, hirano:5, liker:6, rother:7};
+      const brukt = data.ref.slice().sort((a,b)=>nummer[a]-nummer[b]);
+      refs = `<div class="refs"><b>Kilder</b><ol>` +
+        brukt.map(k=>`<li value="${nummer[k]}">${R[k]}</li>`).join('') +
+        `</ol></div>`;
+    }
+  } else {
+    body = `<div class="callout"><b>Denne siden er ikke skrevet ennå.</b> Feltet introduseres i uke ${e ? e.uke : '?'}, og teksten legges inn når temaet undervises.</div>
+      <p>Kort om hva det handler om: ${kort}</p>`;
+  }
+
+  viewPage.innerHTML =
+    `<button class="back" id="backBtn">← Tilbake til huset</button>
+     <div class="kicker" style="--c:${c}">${kicker}</div>
+     <h2>${navn}</h2>
+     ${kort ? `<p class="kort">${kort}</p>` : '<div style="height:14px"></div>'}
+     ${tags ? `<div class="meta">${tags}</div>` : ''}
+     ${body}${refs}`;
+
+  el('backBtn').addEventListener('click', ()=>{ location.hash=''; });
+  viewHouse.classList.add('hidden');
+  viewPage.classList.remove('hidden');
+  window.scrollTo(0,0);
+  viewPage.focus();
+}
+
+function ruting(){
+  const h = location.hash.replace(/^#\/?/,'');
+  if(h){ visSide(h); }
+  else {
+    viewPage.classList.add('hidden');
+    viewHouse.classList.remove('hidden');
+    tegnHus();
+  }
+}
+
+slider.addEventListener('input', ()=>{
+  uke = +slider.value;
+  badge.textContent = 'Uke ' + uke;
+  tegnHus();
+});
+peek.addEventListener('change', tegnHus);
+window.addEventListener('hashchange', ruting);
+
+badge.textContent = 'Uke ' + uke;
+ruting();
+</script>
+</body>
+</html>
