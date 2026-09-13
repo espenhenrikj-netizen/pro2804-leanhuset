@@ -151,8 +151,8 @@ footer a{color:inherit}
     <div class="slider-block">
       <span class="ctrl-label">Semesteruke</span>
       <div class="slider-row">
-        <input type="range" id="weekSlider" min="34" max="46" step="1" value="36" aria-label="Velg semesteruke">
-        <span class="week-badge" id="weekBadge">Uke 36</span>
+        <input type="range" id="weekSlider" min="34" max="46" step="1" value="38" aria-label="Velg semesteruke">
+        <span class="week-badge" id="weekBadge">Uke 38</span>
       </div>
     </div>
     <label class="toggle"><input type="checkbox" id="peekToggle"> Faglærervisning (vis kommende felt)</label>
@@ -215,21 +215,31 @@ const ELEMENTER = [
   {id:'visuell', navn:'Visuell ledelse', uke:36, i:['std'], star:true,
    kort:'Normaltilstand og avvik synlig med det samme, uten at noen må spørre.'},
 
-  /* ---- PLANLAGT VIDERE (juster ukene ved behov) ---- */
+  /* ---- UKE 37 ---- */
   {id:'tpm', navn:'TPM', uke:37, i:['inv','stab'],
    kort:'Totalt produktivt vedlikehold — maskinens stabilitet er operatørens ansvar.'},
-  {id:'flyt', navn:'Flyt', uke:38, i:['jit'],
-   kort:'Én enhet av gangen gjennom prosessen, uten mellomlager.'},
-  {id:'robust', navn:'Robust prosess', uke:38, i:['jit'],
-   kort:'En prosess som tåler variasjon uten å stoppe flyten.'},
-  {id:'takt', navn:'Takttid', uke:39, i:['jit','mal'],
+
+  /* ---- UKE 38 (del 3: standardisert arbeid) ---- */
+  {id:'tid', navn:'Tid i prosessen', uke:38, i:['jit'], star:true,
+   kort:'Ventetid, prosesstid og syklustid — og hvorfor nevneren avgjør svaret.'},
+  {id:'takt', navn:'Takttid', uke:38, i:['jit','mal'],
    kort:'Kundens etterspørsel omregnet til produksjonstakt.'},
+  {id:'stdarbeid', navn:'Standardisert arbeid', uke:38, i:['inv','std','stab'],
+   kort:'Gjeldende beste kjente måte — utgangspunktet for all forbedring.'},
+
+  /* ---- UKE 39 (del 4a: flyt og trekk) ---- */
   {id:'trekk', navn:'Trekksystem', uke:39, i:['jit'],
    kort:'Ingenting produseres før neste ledd faktisk henter det.'},
+  {id:'little', navn:'Littles lov', uke:39, i:['jit'], star:true,
+   kort:'WIP = gjennomstrømning × ledetid. Køen bestemmer ledetida, ikke arbeidstempoet.'},
+  {id:'flyt', navn:'Flyt', uke:39, i:['jit'],
+   kort:'Én enhet av gangen gjennom prosessen, uten mellomlager.'},
+  {id:'robust', navn:'Robust prosess', uke:39, i:['jit'],
+   kort:'En prosess som tåler variasjon uten å stoppe flyten.'},
+
+  /* ---- PLANLAGT VIDERE (juster ukene ved behov) ---- */
   {id:'kanban', navn:'Kanban', uke:40, i:['jit','std','stab'],
    kort:'Signalet som utløser produksjon i et trekksystem.'},
-  {id:'stdarbeid', navn:'Standardisert arbeid', uke:40, i:['inv','std','stab'],
-   kort:'Gjeldende beste kjente måte — utgangspunktet for all forbedring.'},
   {id:'heijunka', navn:'Heijunka', uke:41, i:['jit','mal','stab'],
    kort:'Utjevning av volum og variantmiks over tid.'},
   {id:'leandesign', navn:'Lean design', uke:42, i:['mal'],
@@ -268,6 +278,7 @@ const R = {
   sobek:'D. K. Sobek II og A. Smalley, <i>Understanding A3 Thinking: A Critical Component of Toyota\'s PDCA Management System</i>. New York, NY, USA: Productivity Press, 2008.',
   deming:'W. E. Deming, <i>Out of the Crisis</i>. Cambridge, MA, USA: MIT Press, 1986.',
   hirano:'H. Hirano, <i>5 Pillars of the Visual Workplace: The Sourcebook for 5S Implementation</i>. Portland, OR, USA: Productivity Press, 1995.',
+  hopp:'W. J. Hopp og M. L. Spearman, <i>Factory Physics</i>, 3. utg. Long Grove, IL, USA: Waveland Press, 2011.',
   rother:'M. Rother og J. Shook, <i>Learning to See: Value Stream Mapping to Add Value and Eliminate Muda</i>, v. 1.4. Cambridge, MA, USA: Lean Enterprise Institute, 2009.',
   liker:'J. K. Liker, <i>The Toyota Way: 14 Management Principles from the World\'s Greatest Manufacturer</i>. New York, NY, USA: McGraw-Hill, 2004.'
 };
@@ -566,7 +577,193 @@ tpm:{ref:['dennis'], html:`
 <h3>I dette emnet</h3>
 <p>Uke 37 åpnet induktivt på egne stopphistorier, før pyramiden og OEE-regnestykket ble gitt ferdig. Det arbeidede eksempelet — pølsegrillen til Hilde og Arild — endte på OEE 49 %, påfallende nær Dennis' «under 50 %», men det er en tilfeldighet som følger av tallene som ble valgt, ikke et bevis. Eksempelet viser samtidig grensen for verktøyet: et gatekjøkken er etterspørselsbegrenset, ikke kapasitetsbegrenset, og å «forbedre» ytelsesgraden ved å grille flere pølser ville vært ren overproduksjon.</p>
 <p>I legofabrikken på samlingen finnes ingen maskiner som havarerer, men det finnes anlegg som står stille — spørsmålet er om det er et havari, eller et av de fem hastighetstapene som sjelden blir registrert. Og i AK1, punkt 4, er tilgjengelighetsanslaget dere gjorde i tirsdagsøkta en direkte anvendelse av samme regnestykke på deres egen prosess.</p>
+`},
+
+/* ---------------- UKE 38: DEL 3 ---------------- */
+
+tid:{ref:['dennis','rother'], html:`
+<p>Spørsmålet «hvor lang tid tar denne prosessen?» har ikke ett svar. Det har minst tre, og hvilket du får, avhenger av hvilken klokke du ser på.</p>
+
+<table>
+<tr><th>Begrep</th><th>Hva det er</th></tr>
+<tr><td><b>Ventetid</b></td><td>Tida arbeidet står stille — i kø, i buffer, på lager, i en innboks.</td></tr>
+<tr><td><b>Prosesstid</b></td><td>Tida det faktisk gjøres noe med enheten. Deles i verdiøkende og ikke-verdiøkende tid.</td></tr>
+<tr><td><b>Syklustid</b></td><td>Tida fra start til slutt for det du har valgt å måle — prosesstid pluss ventetid.</td></tr>
+</table>
+
+<div class="callout"><b>Følg enheten, ikke personen.</b> Det er arbeidet som venter, ikke den ansatte. Følger du personen, ser du travelhet. Følger du ordren, pølsa, saken eller pasienten, ser du ventetid. Derfor kan en prosess se hektisk ut og likevel være full av sløsing.</div>
+
+<h3>Nevneren avgjør svaret</h3>
+<p>I det arbeidede eksempelet på gatekjøkkenet (V2, uke 38) er ventetida 330 sekunder, prosesstida 241 sekunder og den verdiøkende tida 170 sekunder. Regnet fra kunden stiller seg i kø blir syklustida 571 sekunder og andelen verdiøkende tid <b>30 %</b>. Flytter du startstreken til <i>bestillingen er mottatt</i>, faller 210 sekunder kø ut, og den samme prosessen kommer ut på <b>47 %</b>.</p>
+<p>Samme prosess, samme tall, nesten dobbelt så godt resultat. Ingen av de to nevnerne er feil — men et forholdstall uten oppgitt nevner er ikke et resultat, det er en påstand. Er du ute etter kundens opplevelse, hører køtida med. Er du ute etter bedriftens egen prosess, kan den holdes utenfor, men da er du samtidig blind for det kundene faktisk klager på.</p>
+
+<h3>Advarsel om ordbruk</h3>
+<p>«Syklustid» brukes ulikt fra bedrift til bedrift. Noen mener tida per enhet på én stasjon, andre mener total gjennomløpstid. Det første du gjør i en ny prosess er å spørre hva de mener med ordet. Ikke anta.</p>
+
+<h3>I dette emnet</h3>
+<p>Tallene er antakelser laget for eksempelet, og presenteres som det — samme krav som dere har i AK1 og AK2. Andelen verdiøkende tid i din egen prosess er ett av stoppunktene i uke 38, og tallet går rett inn i standardarbeidsskjemaet i AK2.</p>
+`},
+
+takt:{ref:['dennis','ohno'], html:`
+<p><b>Takttid = tilgjengelig tid delt på kundens behov.</b> Tilgjengelig tid er tida prosessen er forutsatt å produsere i; behovet er antall enheter i den samme perioden. Svaret er tid per enhet — kundens rytme, oversatt til en klokke.</p>
+
+<div class="callout"><b>Takttid måles ikke, den regnes ut.</b> Du kan ikke gå ut i produksjonen og observere den. Den er et krav, ikke en observasjon — og det er nettopp det som skiller den fra syklustid, som du måler med klokke. Derfor endrer takttida seg når etterspørselen endrer seg, selv om ingenting i prosessen din er annerledes enn i går.</div>
+
+<h3>Regnet på gatekjøkkenet</h3>
+<table>
+<tr><th>Forutsetning</th><th>Verdi</th></tr>
+<tr><td>Åpningstid 11–19</td><td>480 min</td></tr>
+<tr><td>Planlagt stopp (rengjøring)</td><td>−15 min</td></tr>
+<tr><td><b>Tilgjengelig tid</b></td><td><b>465 min = 27 900 s</b></td></tr>
+<tr><td>Etterspørsel</td><td>380 pølser</td></tr>
+<tr><td><b>Takttid</b></td><td><b>≈ 73 s per pølse</b></td></tr>
+</table>
+<p>Det betyr at det må forlate disken en ferdig pølse omtrent hvert 73. sekund, i snitt, gjennom hele åpningstida. Merk hva som <i>ikke</i> ble brukt som teller: verken døgnet eller de 480 minuttene. Det planlagte stoppet er trukket fra, fordi grillen ikke var forutsatt å produsere da.</p>
+
+<h3>De to vanligste feilene</h3>
+<p><b>1. Kalendertid som teller.</b> Døgnet har 86 400 sekunder, men prosessen skal ikke produsere i noen av dem du ikke er bemannet for. Er du i tvil: var prosessen forutsatt å produsere akkurat da?</p>
+<p><b>2. Å tro at takttid er en hastighet.</b> Takttid er et referansetall. Klarer du den ikke, er svaret aldri «løp fortere» — det er å endre arbeidsinnholdet, fordelingen mellom folk, eller antall hender.</p>
+
+<h3>I dette emnet</h3>
+<p>På samlingen er kundekravet i tredje segment tolv fly og ett minutts takttid. Da er dette tallet ikke lenger teori: det avgjør hvor mange hender som må stå i linja, og det gjør det umulig å bygge flyene slik de ble bygd i runde 1 — uansett hvor fort dere jobber.</p>
+`},
+
+stdarbeid:{ref:['dennis','ohno','liker'], html:`
+<p>En standard er den beste kjente måten å gjøre en jobb på — <b>akkurat nå</b>. Ikke for alltid. Den er i bruk i dag, av dem som gjør jobben, og den er laget av eller sammen med dem [1].</p>
+
+<div class="callout"><b>En prosedyre som ingen følger, er ikke en dårlig standard.</b> Den er ikke en standard i det hele tatt. Er den skrevet av noen andre, for en revisor, og ligger på et intranett ingen åpner, beskriver den et ønske — ikke arbeidet.</div>
+
+<h3>De tre elementene</h3>
+<table>
+<tr><th>Element</th><th>Hva det svarer på</th></tr>
+<tr><td><b>Takttid</b></td><td>Hvilken rytme arbeidet skal gå i. Står øverst på arket, fordi den er kravet alt annet må passe inn i.</td></tr>
+<tr><td><b>Arbeidssekvens</b></td><td>Hva som gjøres, i hvilken rekkefølge, av hvem, med hvilken tid på hvert steg.</td></tr>
+<tr><td><b>Standard-WIP</b></td><td>Hvor mye arbeid som må ligge mellom stegene for at sekvensen skal gå uten stopp.</td></tr>
+</table>
+<p>Det tredje er det folk glemmer, og det er som regel det som avgjør om standarden virker. Sett den til null, og alt stopper første gang noe varierer. Sett den for høyt, og du har bygget deg et lager og kalt det en standard.</p>
+
+<h3>Arbeidet eksempel: Arilds standardarbeid</h3>
+<p>Takttid 73 s per pølse. Første utkast lød «grill pølser — lag ordren ferdig — sett brettet på disken», og ble forkastet: det kan ikke tidfestes, det skjuler flaskehalsen, og det lærer ingen opp. Andre utkast:</p>
+<table>
+<tr><th>Steg</th><th>Handling</th><th>Tid</th></tr>
+<tr><td>1</td><td>Ta pølse fra kjøleskuff, legg på grill</td><td>5 s</td></tr>
+<tr><td>2</td><td>Grill, snu én gang</td><td>35 s</td></tr>
+<tr><td>3</td><td>Ta brød, legg pølse i</td><td>10 s</td></tr>
+<tr><td>4</td><td>Legg på tilbehør etter ordre</td><td>10 s</td></tr>
+<tr><td>5</td><td>Pakk i papir, legg på brett</td><td>5 s</td></tr>
+<tr><td></td><td><b>Sum syklustid</b></td><td><b>65 s</b></td></tr>
+</table>
+<p>Nå kan 65 sammenlignes med 73, og de åtte sekundene luft kan plasseres på steg 4 når arbeidet skal balanseres. Standard-WIP settes til <b>2 pølser</b>: gjenoppfylling tar rundt 80 sekunder, altså om lag én takts etterspørsel.</p>
+
+<div class="callout"><b>Er det sløsing at Arild griller før bestillingen kommer?</b> Det avhenger av om tallet finnes. Er bufferen regnet ut fra takttid og gjenoppfyllingstid, er den standard-WIP og en del av standarden. Grilles det «for sikkerhets skyld», er det overproduksjon. Samme handling, samme pølser — forskjellen er om noen har regnet.</div>
+
+<h3>Standard og kaizen</h3>
+<p>Arket er ikke et sluttpunkt, men et nullpunkt: først nå kan noen prøve en ny måte og <i>vite</i> om det ble bedre. Bildet er en trapp der hvert trinn er en standard og kaizen er steget opp — og det nye trinnet blir den nye standarden. På PDCA-språket fra uke 35: standarden er utgangspunktet i «Plan» og resultatet i «Act». Uten standard finnes det ingen kaizen, bare endring.</p>
+
+<h3>I dette emnet</h3>
+<p>Dette er innholdet i <b>AK2</b>, som forfaller i uke 40. Stoppunktene i videoene V2–V5 i uke 38 er utkastet: andel verdiøkende tid, takttid for egen prosess, arbeidsbalansering, arbeidssekvens i 5–8 steg og et begrunnet tall for standard-WIP.</p>
+`},
+
+/* ---------------- UKE 39: DEL 4a ---------------- */
+
+trekk:{ref:['dennis','ohno','rother'], html:`
+<p>I et <b>skyvesystem (push)</b> leverer hver stasjon videre når den selv er ferdig, uavhengig av om den neste har bruk for det. Signalet kommer bakfra: «jeg har kapasitet, altså produserer jeg». I et <b>trekkesystem (pull)</b> produserer stasjonen bare når den neste har plass til å ta imot. Signalet kommer forfra: «det er plass hos meg, altså kan du lage mer» [1], [2].</p>
+
+<h3>Fire ting følger av skyv</h3>
+<table>
+<tr><th>Virkning</th><th>Hvorfor</th></tr>
+<tr><td>Lager bygger seg opp</td><td>Ingenting i reglene sier at haugen skal slutte å vokse.</td></tr>
+<tr><td>Feil oppdages sent</td><td>Ligger det tjue enheter i kø og noe er galt, er alle tjue gale før noen finner det ut.</td></tr>
+<tr><td>Ledetida blir lang</td><td>Følger direkte av Littles lov.</td></tr>
+<tr><td>Variasjon skjules</td><td>Ingen merker at en stasjon hadde en dårlig dag — haugen absorberer den.</td></tr>
+</table>
+
+<div class="callout"><b>Bufferen føles som trygghet.</b> Det den faktisk gjør, er å gjøre deg blind. De to siste punktene er de minst opplagte og de dyreste.</div>
+
+<h3>Fem forutsetninger for trekk</h3>
+<p>Trekk er ikke noe man bare bestemmer seg for. Det forutsetter flyt, kjent syklustid, takttid, balansert arbeid og standardisert arbeid — altså <b>hele del 3 fra uke 38</b>. Uten kjent syklustid og balansert arbeid blir et trekkesystem bare en linje som står stille og venter på hverandre. Har du derimot gjort del 3-arbeidet, er trekk stort sett én regel du kan innføre.</p>
+
+<h3>Virkelighetsanker</h3>
+<p>Dell bygde datamaskiner etter kundeordre: ordren utløser produksjonen, ikke omvendt, og leverandørene fylte på mot faktisk forbruk. Resultatet var lite ferdigvarelager i en bransje der komponentene taper verdi hver uke de ligger. Merk at hensikten ikke var å produsere <i>mer</i>, men å produsere <i>senere</i> — så nær kundens faktiske behov som mulig.</p>
+
+<h3>I dette emnet</h3>
+<p>Miniøvelsen tirsdag 22. september er nettopp dette: samme linje, samme terninger, samme fem personer, og én regel til forskjell — ingen får legge mer enn fem enheter i innboksen til den neste. Runde A er skyv, runde B er trekk. Begrepene kommer først <i>etter</i> at dere har kjørt begge rundene, og det er med vilje.</p>
+`},
+
+little:{ref:['hopp','rother'], html:`
+<p><b>Arbeid i prosess = gjennomstrømning × ledetid.</b> Omskrevet slik vi bruker den: <b>ledetid = WIP delt på gjennomstrømning</b>. Loven gjelder for stabile systemer over tid, og den er ingen tilnærming — den er en identitet. Kjenner du to av størrelsene, kjenner du den tredje.</p>
+
+<div class="callout"><b>Ledetida di bestemmes av hvor mye som ligger foran deg i køen.</b> Ikke av hvor fort folk jobber. Av køen.</div>
+
+<h3>Regnet på miniøvelsen</h3>
+<p>Tallene under er fra en testkjøring av regnearket over 20 takter — deres egne tall settes ved siden av:</p>
+<table>
+<tr><th></th><th>Runde A (skyv)</th><th>Runde B (trekk)</th><th>Endring</th></tr>
+<tr><td>Ut per takt</td><td>2,0</td><td>1,83</td><td>−8 %</td></tr>
+<tr><td>Gjennomsnittlig WIP</td><td>21</td><td>13</td><td>−38 %</td></tr>
+<tr><td><b>Ledetid</b></td><td><b>10,4 takter</b></td><td><b>7,1 takter</b></td><td><b>−32 %</b></td></tr>
+</table>
+<p>Fem takters arbeid, ti takters ledetid: halve tida sto enheten i kø. Handelen er åtte prosent produksjon mot en tredjedel kortere ledetid — om det er en god handel avhenger av hva kunden er ute etter, og det er derfor et ledelsesspørsmål, ikke et teknisk.</p>
+
+<h3>Den forskjellen tabellen skjuler</h3>
+<p>I runde A <i>vokser</i> WIP-en. Etter 20 takter ligger det rundt 30 enheter i linja, etter 40 takter rundt 40 — og da sier loven at ledetida vokser i takt med haugen. Kjør lenge nok, og ledetida går mot uendelig. I runde B stanser WIP-en på rundt 15 og blir der. Et skyvesystem har altså ikke bare lang ledetid; det har en ledetid <b>ingen kan love kunden noe om</b>, fordi den avhenger av hvor lenge systemet har gått.</p>
+
+<h3>Mer WIP gir ikke mer ut</h3>
+<p>Gjennomstrømningen bestemmes av kapasiteten, ikke av hvor mye du putter inn. Slipper du inn mer enn systemet klarer å bearbeide, øker ikke det som kommer ut — det eneste som øker er WIP, og dermed ledetida. Sagt med gatekjøkkenet: å ta imot flere bestillinger enn Arild rekker å grille, gir ikke flere solgte pølser. Det gir lengre kø. De 210 sekundene i kø fra V2 <i>er</i> WIP. Kunder er WIP.</p>
+
+<h3>I dette emnet</h3>
+<p>Littles lov er den enkleste kontrollregningen dere har på en Simul8-modell: er ledetida kort mens køene er lange, er modellen feil. På samlingen ligger det halvferdige fly mellom anleggene i runde 1 og 2 — tell dem, det tallet er WIP, og det skal inn i prosjektrapporten.</p>
+`},
+
+flyt:{ref:['dennis','ohno','rother'], html:`
+<p><b>Enkeldelsflyt</b> er det ytterste tilfellet av trekk: én enhet bearbeides og sendes videre med det samme. Motstykket er <b>batch og kø</b>, der flere enheter bearbeides samtidig på hvert steg og hele partiet flyttes videre når det er ferdig.</p>
+
+<h3>To ting skjer når du går fra batch til flyt</h3>
+<p><b>Ledetida faller.</b> Det følger av Littles lov: mindre WIP, samme kapasitet, kortere ledetid. Ingen ny innsikt — samme formel.</p>
+<p><b>Feil oppdages umiddelbart.</b> Lager du femti enheter før noen kontrollerer, og feilen oppsto på enhet nummer tre, har du førtiåtte gale enheter. Lager du én om gangen, oppdages feilen på enhet nummer fire. Kvalitetskostnaden er ikke bare en funksjon av hvor ofte du gjør feil, men av <b>hvor lenge feilen får lov til å gjenta seg</b>. Buffer er tid før oppdagelse.</p>
+
+<h3>Hvorfor taket likevel ikke settes til én</h3>
+<table>
+<tr><th>Tak per innboks</th><th>Ut per takt</th><th>Snitt-WIP</th><th>Ledetid</th></tr>
+<tr><td>Ingen (runde A)</td><td>2,00</td><td>21</td><td>10,4 takter</td></tr>
+<tr><td>5 (runde B)</td><td>1,83</td><td>13</td><td>7,1 takter</td></tr>
+<tr><td>3</td><td>1,51</td><td>9,0</td><td>6,0 takter</td></tr>
+<tr><td>2</td><td>1,23</td><td>6,5</td><td>5,3 takter</td></tr>
+<tr><td>1 (enkeldelsflyt)</td><td><b>0,80</b></td><td>3,7</td><td>4,6 takter</td></tr>
+</table>
+<p>Ledetida blir kortere hele veien ned — men gjennomstrømningen kollapser, fra 2,0 til 0,8. Årsaken er terningen: når stasjonene er tett koblet og bufferne borte, forplanter hvert dårlig kast seg umiddelbart til naboene.</p>
+
+<div class="callout"><b>Enkeldelsflyt er ikke et mål i seg selv — den forutsetter lav variasjon.</b> Og lav variasjon kommer fra 5S, som fjerner leting; visuell ledelse, som gjør avvik synlige; TPM, som fjerner uplanlagte stopp; og standardisert arbeid, som fjerner forskjellen mellom folk. Det er hele del 2 og del 3. Uten dem tåler ikke linja å bli strammet.</div>
+
+<h3>Arbeidscellen</h3>
+<p>I en U-formet celle er regelen den samme som i runde B, bare skarpere: jobb bare hvis den neste trenger det, og sjekk det ved å se om plassen deres er tom. Kunden kjøper et produkt, det gjør en plass ledig hos siste oppgave, som da får lov til å produsere — og signalet forplanter seg bakover helt til råvaren. <b>Informasjonen går bakover, materialet går forover.</b> Verktøyet som bærer signalet i praksis heter kanban, og kommer i uke 40.</p>
+`},
+
+robust:{ref:['dennis','liker','hopp'], html:`
+<p>En <b>robust prosess</b> tåler variasjon uten at flyten bryter sammen. Det er forutsetningen for alt som strammes: jo mindre buffer, desto mer må prosessen selv tåle.</p>
+
+<h3>Variasjon forsvinner ikke — den flyttes</h3>
+<p>Et system med store buffere ser robust ut fordi ingenting stopper. Det er en illusjon: variasjonen er der fortsatt, den er bare absorbert av lageret. Prisen er lang og uforutsigbar ledetid, sen feiloppdagelse og en organisasjon som ikke vet hvor problemene sitter. Fjerner du bufferen uten først å ha redusert variasjonen, bytter du bare ett synlig problem mot et annet.</p>
+
+<div class="callout"><b>En linje som aldri stopper, er ikke nødvendigvis en god linje.</b> Det kan være en linje med for mye lager.</div>
+
+<h3>Stoppet er informasjon</h3>
+<p>I en balansert linje med lite buffer vil de raske oppgavene stoppe og vente. Det ser ut som sløsing, og i de fleste organisasjoner er det det første noen prøver å «fikse» — gjerne ved å gi den ledige personen noe annet å gjøre. Men stoppet viser nøyaktig hvor variasjonen sitter, akkurat idet den oppstår. En stor buffer ville skjult det samme problemet, og da hadde du hatt et problem uten å vite om det.</p>
+
+<h3>Hvor robustheten kommer fra</h3>
+<table>
+<tr><th>Kilde</th><th>Hvilken variasjon den fjerner</th></tr>
+<tr><td>5S</td><td>Leting, feil verktøy, uklar normaltilstand</td></tr>
+<tr><td>Visuell ledelse</td><td>Avvik som ikke oppdages i tide</td></tr>
+<tr><td>TPM</td><td>Uplanlagte stopp og hastighetstap</td></tr>
+<tr><td>Standardisert arbeid</td><td>Forskjellen mellom hvordan to personer gjør samme jobb</td></tr>
+<tr><td>Heijunka (uke 41)</td><td>Svingninger i volum og variantmiks</td></tr>
+</table>
+
+<h3>I dette emnet</h3>
+<p>Rekkefølgen i emnet er ikke tilfeldig. Del 2 og del 3 kom først fordi de er det som gjør terningen mindre tilfeldig. På samlingen er dette den harde begrensningen i runde 2 og 3: dere kan ikke stramme flyten før anleggene faktisk gjør det samme hver gang.</p>
 `}
+
 };
 
 /* =======================================================================
@@ -578,7 +775,7 @@ const house = el('house'), slider = el('weekSlider'), badge = el('weekBadge'),
       peek = el('peekToggle'), statusLine = el('statusLine'),
       viewHouse = el('view-house'), viewPage = el('view-page');
 
-let uke = 36;
+let uke = 38;
 let forrigeSynlige = new Set();
 
 function farge(sid){ return (SEKSJONER.find(s=>s.id===sid)||{}).farge || 'var(--muted)'; }
@@ -665,7 +862,7 @@ function visSide(id){
   if(data){
     body = data.html;
     if(data.ref && data.ref.length){
-      const nummer = {dennis:1, ohno:2, sobek:3, deming:4, hirano:5, liker:6, rother:7};
+      const nummer = {dennis:1, ohno:2, sobek:3, deming:4, hirano:5, liker:6, rother:7, hopp:8};
       const brukt = data.ref.slice().sort((a,b)=>nummer[a]-nummer[b]);
       refs = `<div class="refs"><b>Kilder</b><ol>` +
         brukt.map(k=>`<li value="${nummer[k]}">${R[k]}</li>`).join('') +
