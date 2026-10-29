@@ -151,8 +151,8 @@ footer a{color:inherit}
     <div class="slider-block">
       <span class="ctrl-label">Semesteruke</span>
       <div class="slider-row">
-        <input type="range" id="weekSlider" min="34" max="46" step="1" value="38" aria-label="Velg semesteruke">
-        <span class="week-badge" id="weekBadge">Uke 38</span>
+        <input type="range" id="weekSlider" min="34" max="46" step="1" value="44" aria-label="Velg semesteruke">
+        <span class="week-badge" id="weekBadge">Uke 44</span>
       </div>
     </div>
     <label class="toggle"><input type="checkbox" id="peekToggle"> Faglærervisning (vis kommende felt)</label>
@@ -237,32 +237,34 @@ const ELEMENTER = [
   {id:'robust', navn:'Robust prosess', uke:39, i:['jit'],
    kort:'En prosess som tåler variasjon uten å stoppe flyten.'},
 
-  /* ---- PLANLAGT VIDERE (juster ukene ved behov) ---- */
+  /* ---- UKE 40–42 ---- */
   {id:'kanban', navn:'Kanban', uke:40, i:['jit','std','stab'],
    kort:'Signalet som utløser produksjon i et trekksystem.'},
   {id:'heijunka', navn:'Heijunka', uke:41, i:['jit','mal','stab'],
    kort:'Utjevning av volum og variantmiks over tid.'},
   {id:'leandesign', navn:'Lean design', uke:42, i:['mal'],
    kort:'Produktet designes for enkel og feilfri produksjon (DFMA).'},
-  {id:'jidoka-akt', navn:'Jidoka (som aktivitet)', uke:43, i:['stab'],
+  /* ---- UKE 44 (del 5: jidoka, poka-yoke — flyttet fra uke 43) ---- */
+  {id:'jidoka-akt', navn:'Jidoka (som aktivitet)', uke:44, i:['stab'],
    kort:'Stopp ved avvik — feilen får ikke gå videre.'},
-  {id:'poka', navn:'Poka-yoke', uke:43, i:['jidoka'],
+  {id:'poka', navn:'Poka-yoke', uke:44, i:['jidoka'],
    kort:'Feilsikring: gjør feilhandlingen fysisk umulig.'},
-  {id:'sone', navn:'Sonekontroll', uke:43, i:['jidoka'],
-   kort:'Avviket fanges innenfor sin egen sone, ikke hos kunden.'},
-  {id:'problem', navn:'Problemløsning', uke:43, i:['jidoka'],
+  {id:'sone', navn:'Sonekontroll', uke:44, i:['jidoka'],
+   kort:'Hvert ledd eier kvaliteten i sin sone, med leverandør oppstrøms og kunde nedstrøms.'},
+  {id:'problem', navn:'Problemløsning', uke:44, i:['jidoka'],
    kort:'Systematisk jakt på rotårsak, ikke på symptom.'},
-  {id:'avvik', navn:'Avvikskontroll', uke:43, i:['jidoka'],
+  {id:'avvik', navn:'Avvikskontroll', uke:44, i:['jidoka'],
    kort:'Definert normaltilstand, definert respons når den brytes.'},
-  {id:'menneske', navn:'Skille menneske- og maskinarbeid', uke:43, i:['jidoka'],
+  {id:'menneske', navn:'Skille menneske- og maskinarbeid', uke:44, i:['jidoka'],
    kort:'Mennesket skal ikke stå og se på at maskinen går.'},
-  {id:'involvering-akt', navn:'Involvering', uke:44, i:['jit','jidoka','mal'],
+  /* ---- UKE 45 (del 6 og 7 — del 6 flyttet fra uke 44) ---- */
+  {id:'involvering-akt', navn:'Involvering', uke:45, i:['jit','jidoka','mal'],
    kort:'Uten folk som vil, er verktøyene tomme skall.'},
-  {id:'kaizen', navn:'Kaizen-sirkler', uke:44, i:['inv'],
+  {id:'kaizen', navn:'Kaizen-sirkler', uke:45, i:['inv'],
    kort:'Små, faste grupper som forbedrer sitt eget arbeid.'},
-  {id:'forslag', navn:'Forbedringsforslag', uke:44, i:['inv'],
+  {id:'forslag', navn:'Forbedringsforslag', uke:45, i:['inv'],
    kort:'Systemet som gjør at et forslag faktisk blir til noe.'},
-  {id:'sikkerhet', navn:'Sikkerhetsaktiviteter', uke:44, i:['inv'],
+  {id:'sikkerhet', navn:'Sikkerhetsaktiviteter', uke:45, i:['inv'],
    kort:'Sikkerhet er ikke et tillegg til Lean — det er inngangen.'},
   {id:'hoshin', navn:'Hoshin-planlegging', uke:45, i:['inv','std','mal'],
    kort:'Strategien brytes ned til noe hver enkelt kan handle på.'}
@@ -326,20 +328,22 @@ jidoka:{ref:['dennis','ohno','liker'], html:`
 <p><b>Jidoka</b> er høyre søyle. Ordet oversettes vanligvis som «automatisering med et menneskelig sinn» eller <b>innebygd kvalitet</b>. Prinsippet er enkelt og radikalt: <b>når noe unormalt skjer, stopper prosessen — feilen får ikke gå videre</b> [1], [2].</p>
 
 <h3>Opprinnelsen</h3>
-<p>Sakichi Toyoda bygde i 1896 en vevstol som stoppet av seg selv når en tråd røk. Effekten var ikke først og fremst bedre kvalitet, men noe annet: én operatør kunne nå passe mange maskiner i stedet for å stå og se på én. Kvalitet og produktivitet ble løst av samme grep [7].</p>
+<p>Sakichi Toyoda laget i 1902 en vevstol som stoppet av seg selv når en tråd røk. Effekten var ikke bare bedre kvalitet: én operatør kunne nå passe dusinvis av vevstoler i stedet for å stå og se på én. Kvalitet og produktivitet ble løst av samme grep [1].</p>
 
-<h3>Fire ting jidoka gjør</h3>
+<h3>Tre regler og fire steg</h3>
+<p>Jidoka kan kokes ned til tre regler: <b>ikke ta imot feil, ikke lag feil, ikke send feil videre</b> [1]. Den vanskeligste, «ikke lag feil», har fire steg:</p>
 <ol>
-<li><b>Oppdager avviket</b> — automatisk der det er mulig, ved definert normaltilstand der det ikke er det.</li>
-<li><b>Stopper</b> — linja, stasjonen eller sonen. Ikke fortsett og fiks senere.</li>
-<li><b>Varsler</b> — andon-signal, synlig for alle.</li>
-<li><b>Finner rotårsak</b> — så det samme avviket ikke skjer igjen.</li>
+<li><b>Oppdag</b> feilen — eller enda bedre, feilhandlingen før den blir en defekt.</li>
+<li><b>Stopp</b> prosessen. Ikke fortsett og fiks senere.</li>
+<li><b>Tilkall hjelp</b> og rett opp det umiddelbare problemet — andon-signalet.</li>
+<li><b>Løs rotårsaken</b>, så det samme ikke skjer igjen.</li>
 </ol>
+<p>Maskiner er best på steg 1 og 2, mennesker på steg 3 og 4 [1].</p>
 
 <div class="callout"><b>Det kontraintuitive:</b> jidoka gir en organisasjon som stopper oftere, men står stille kortere. Å la et problem løpe koster mer enn å stanse for det, fordi kostnaden ved en feil vokser jo lenger ned i verdikjeden den oppdages.</div>
 
 <h3>I dette emnet</h3>
-<p>Jidoka er lagt til <i>etter</i> samlingen, i uke 43, og det er et bevisst valg. Dere skal først møte kvalitetsproblemet selv i simuleringens segment 3 — når feil fly kommer helt fram til kunden — slik at jidoka blir svaret på noe dere har erfart, ikke et begrep dere har fått utdelt på forhånd.</p>
+<p>Jidoka er lagt til <i>etter</i> samlingen, i uke 44, og det er et bevisst valg. Dere skal først møte kvalitetsproblemet selv i simuleringens segment 3 — når feil fly kommer helt fram til kunden — slik at jidoka blir svaret på noe dere har erfart, ikke et begrep dere har fått utdelt på forhånd.</p>
 `},
 
 inv:{ref:['dennis','liker'], html:`
@@ -762,6 +766,142 @@ robust:{ref:['dennis','liker','hopp'], html:`
 
 <h3>I dette emnet</h3>
 <p>Rekkefølgen i emnet er ikke tilfeldig. Del 2 og del 3 kom først fordi de er det som gjør terningen mindre tilfeldig. På samlingen er dette den harde begrensningen i runde 2 og 3: dere kan ikke stramme flyten før anleggene faktisk gjør det samme hver gang.</p>
+`},
+
+/* ---------------- UKE 44: DEL 5 ---------------- */
+
+'jidoka-akt':{ref:['dennis','ohno'], html:`
+<p>I grunnmuren står jidoka som en <b>aktivitet</b>, ikke bare som en søyle: det er det som skjer hver gang noe unormalt oppdages. Stopper prosessen ved avviket, kommer problemet til overflaten mens det er lite. Får det løpe, blir det borte i lager og omarbeid — og prosessen blir aldri stabil [1].</p>
+
+<h3>Tre regler</h3>
+<table>
+<tr><th>Regel</th><th>Gjelder</th></tr>
+<tr><td>Ikke ta imot feil</td><td>Det som kommer inn til deg</td></tr>
+<tr><td>Ikke lag feil</td><td>Det du gjør selv</td></tr>
+<tr><td>Ikke send feil videre</td><td>Det du leverer til neste ledd</td></tr>
+</table>
+<p>Hvert ledd i en prosess er både kunde og leverandør. Reglene gjelder derfor overalt i linja, ikke bare ved sluttkontrollen [1].</p>
+
+<h3>Hvorfor ikke bare være mer nøyaktig?</h3>
+<p>Fordi mennesker gjør feil. Selv godt trent personell i simulerte nødsituasjoner feiler omtrent hver femte gang, og det aller beste et menneske kan klare, er rundt én feil per 10 000 forsøk [1]. Shigeo Shingo skilte derfor mellom <b>feilhandlinger</b>, som ikke kan unngås helt, og <b>defekter</b>, som kan fjernes. Delen som settes bak fram, er feilhandlingen. Produktet som når kunden med delen bak fram, er defekten. Mellom de to har prosessen en sjanse til å stoppe.</p>
+
+<div class="callout"><b>Stopp produksjonen, så produksjonen aldri må stoppe.</b> Under oppstart av en ny modell hos Toyota stoppet linja hele tiden, og de første skiftene ble det bare laget 10–15 biler. Så kom de raskt opp i full produksjon — og ble der [1]. Just-in-time uten jidoka er, med Dennis' ord, bare å sende skrap raskere.</div>
+
+<h3>I dette emnet</h3>
+<p>Kvalitetsoppgaven i uke 44 tar utgangspunkt i feilene fra samlingen: hvor oppstod de, hvor ble de oppdaget, og hvor mange ledd lå imellom? Det er de tre reglene, målt i deres egen fabrikk.</p>
+`},
+
+poka:{ref:['dennis','deming'], html:`
+<p><b>Poka-yoke</b> betyr «å hindre utilsiktede feil». Det er enkle, billige innretninger som enten oppdager en unormal situasjon før den blir en defekt, eller stopper prosessen når den har oppstått. Begrepet er Shigeo Shingos, og det var hans svar på spørsmålet «hvorfor ikke null feil?» [1].</p>
+
+<h3>Hva en god poka-yoke er</h3>
+<p>Den <b>kontrollerer 100 %</b> av enhetene og gir <b>umiddelbar tilbakemelding</b>, slik at noen må handle [1]. Dennis stiller fire krav:</p>
+<ol>
+<li>Enkel og varig, med lite vedlikehold</li>
+<li>Svært pålitelig</li>
+<li>Billig</li>
+<li>Laget for forholdene på akkurat den arbeidsplassen</li>
+</ol>
+
+<h3>To handlinger</h3>
+<table>
+<tr><th>Handling</th><th>Hva skjer</th><th>Eksempel</th></tr>
+<tr><td><b>Stopp</b> (sterkest)</td><td>Maskinen starter ikke, eller stopper</td><td>En maskin starter bare når emnet berører alle referansepinnene</td></tr>
+<tr><td><b>Varsel</b></td><td>Lys eller lyd</td><td>Andon-tavla som lyser når noen drar i snora</td></tr>
+</table>
+
+<h3>Tre veier</h3>
+<table>
+<tr><th>Avvik i …</th><th>Hva oppdages</th><th>Eksempel</th></tr>
+<tr><td>Arbeidsstykket</td><td>Vekt, mål, form</td><td>En føringspinne gjør at delen bare passer én vei</td></tr>
+<tr><td>Arbeidsmetoden</td><td>Et steg er hoppet over</td><td>En sveisejigg tar bare imot emner som allerede er boret</td></tr>
+<tr><td>Fast verdi</td><td>Antall, trykk, temperatur</td><td>En del til overs i monteringssettet viser at noe er glemt</td></tr>
+</table>
+
+<div class="callout"><b>Det beste eksempelet er kanskje det enkleste.</b> En pakkelinje sendte av og til ut tomme esker. Løsningen var en vanlig vifte ved siden av båndet: tomme esker er lette og blåses av, fulle blir stående [1].</div>
+
+<h3>Poka-yoke og respekt for mennesker</h3>
+<p>En poka-yoke flytter spørsmålet fra «hvem gjorde feilen?» til «hvorfor var det mulig å gjøre den?». Dennis knytter det til Demings «stolthet over eget arbeid»: folk vil gjøre en god jobb, og lederens oppgave er å fjerne det som står i veien [1], [4]. Det er også grunnen til at <b>de som jobber på gulvet, vanligvis er den beste kilden til poka-yoker</b> [1].</p>
+
+<h3>I dette emnet</h3>
+<p>I verkstedet i uke 44 feilsikrer dere tre av feilene fra samlingen. Et tiltak dere ikke gjennomførte, er et <i>forslag</i> i rapporten, ikke et resultat.</p>
+`},
+
+sone:{ref:['dennis'], html:`
+<p><b>Sonekontroll</b> betyr at hvert ledd tenker på sitt eget område som en liten bedrift: med en leverandør oppstrøms, en kunde nedstrøms og ansvar for kvaliteten i sin egen sone. For en lagleder er sonen laget og arbeidsområdet; for en fabrikksjef er den hele fabrikken. Når hver sone har sine egne kontroller, blir systemet som helhet robust — det er kjernen i pålitelighetsteknikk [1].</p>
+
+<h3>Tre typer inspeksjon</h3>
+<p>Hvor feilen fanges, avgjør hvor mye den koster. Dennis beskriver tre typer inspeksjon, her tegnet som en trapp fra dårligst til best [1]:</p>
+<table>
+<tr><th>Trinn</th><th>Hva den gjør</th><th>Svakhet / styrke</th></tr>
+<tr><td><b>Bedømmende</b></td><td>Godkjent / ikke godkjent, ofte til slutt</td><td>Hindrer at defekten når kunden, men gir lite tilbakemelding til kilden</td></tr>
+<tr><td><b>Informativ</b></td><td>Finner defekter og gir beskjed tilbake til kilden</td><td>Best som <i>selvkontroll</i> eller <i>kontroll hos neste stasjon</i>, gjort som likemenn</td></tr>
+<tr><td><b>Kilde</b></td><td>Finner feilhandlingen før den blir en defekt</td><td>Forhindrer defekten. Kan være vertikal (rotårsak oppstrøms) eller horisontal (rotårsak i egen avdeling)</td></tr>
+</table>
+
+<div class="callout"><b>Åstedet.</b> Dennis bruker bildet fra krimserier: kommer du raskt til åstedet, er sporene der ennå. Inspeksjon i etterkant er å komme dagen etter, når åstedet er tråkket ned [1].</div>
+
+<h3>I dette emnet</h3>
+<p>På samlingen var hvert anlegg en sone, med et annet anlegg eller leverandøren som leverandør. Hvor i fabrikken ble feilene fanget — og på hvilket trinn i trappa?</p>
+`},
+
+problem:{ref:['dennis','ohno','sobek'], html:`
+<p>Jidoka slutter ikke med at linja stopper. Det fjerde steget — <b>løs rotårsaken, så det ikke skjer igjen</b> — er det som gjør stoppet verdt prisen. Uten det har du bare en dyrere måte å finne de samme feilene på [1].</p>
+
+<h3>Først stoppe blødningen, så finne årsaken</h3>
+<p>Hos Toyota hadde teamet 60 sekunder når andon-tavla lyste. Rakk de ikke å løse problemet, ble det satt inn et midlertidig tiltak — vanligvis en form for oppsamling av mulige defekter — og enheten ble tatt ut av linja eller merket for senere [1]. To ting skjer altså samtidig: linja kommer i gang igjen, og problemet går videre til grundig problemløsning.</p>
+
+<h3>Spør hvorfor fem ganger</h3>
+<p>Taiichi Ohno lærte bort å spørre «hvorfor?» om og om igjen til man finner årsaken bak årsaken [2]. Maskinen stoppet. Hvorfor? Overbelastning, og sikringen gikk. Hvorfor? Lageret var ikke godt nok smurt. Hvorfor? Smørepumpa pumpet ikke nok. Og så videre — helt til svaret er noe man kan endre, ikke bare noe man kan bytte.</p>
+
+<div class="callout"><b>Et midlertidig tiltak er ikke en løsning.</b> Men uten det står linja. Problemløsning i jidoka er å holde begge deler i hodet samtidig.</div>
+
+<h3>Standardisert problemløsning</h3>
+<p>Dennis peker på at det som gjorde Toyota rask, var en <b>felles, standardisert måte å løse problemer på</b> og sterke tilbakemeldingssløyfer mellom avdelingene [1]. I dette emnet er det A3-arket og PDCA fra uke 35 [3].</p>
+
+<h3>I dette emnet</h3>
+<p>Rapportens 4.3 ber dere drøfte kvalitetsproblemene i lys av jidoka. Skillet mellom midlertidig tiltak og rotårsak er et godt sted å begynne.</p>
+`},
+
+avvik:{ref:['dennis','ohno'], html:`
+<p><b>Avvikskontroll</b> forutsetter to ting: at normaltilstanden er definert, og at det er bestemt hva som skjer når den brytes. Uten det første kan ingen se avviket. Uten det andre ser alle det, og ingen gjør noe [1].</p>
+
+<h3>Cowboyene</h3>
+<p>Ohno sammenlignet produksjon med kvegdrift i westernfilmene: noen få cowboyer flytter tusenvis av dyr. Under normale forhold følger de bare flokken. Begynner flokken å dra ut av kurs, rir de fram og retter den opp — med en gang [1], [2]. Det er avvikskontroll: lite innsats når alt går som normalt, rask og bestemt innsats når det ikke gjør det.</p>
+
+<h3>Binære tester</h3>
+<p>Dennis beskriver jidoka som <b>direkte koblinger mellom leverandør og kunde</b> og <b>innebygde OK / ikke OK-tester</b> [1]. Testen skal ikke kreve tolkning. Sammen gjør de det mulig å:</p>
+<ol>
+<li>oversette kundens behov til noen få, avtalte mål,</li>
+<li>sette dem på en tavle med mål mot faktisk og rød/grønn status,</li>
+<li>gå gjennom de røde punktene i et kort, daglig stående møte.</li>
+</ol>
+
+<div class="callout"><b>Et avvik du ikke kan se, kan du ikke stoppe for.</b> Derfor henger avvikskontroll tett sammen med visuell orden (5S) og visuell ledelse fra uke 36.</div>
+
+<h3>I dette emnet</h3>
+<p>Datafangstskjemaet fra samlingen er en enkel avviksregistrering: kundekrav mot levert, og avviste fly med årsak. Hvilke avvik så dere i fabrikken mens rundene pågikk, og hvilke så dere først i skjemaet etterpå?</p>
+`},
+
+menneske:{ref:['dennis','ohno'], html:`
+<p>Jidoka handler ikke om å la maskiner ta over kvaliteten. Det handler om å <b>skille det maskinen er god på fra det mennesket er god på</b> [1].</p>
+
+<table>
+<tr><th>Maskinen er best til å …</th><th>Mennesket er best til å …</th></tr>
+<tr><td>oppdage avvik, hver gang, uten å bli trett</td><td>tilkalle hjelp og rette opp det umiddelbare problemet</td></tr>
+<tr><td>stoppe prosessen</td><td>finne rotårsaken og forbedre prosessen</td></tr>
+</table>
+
+<h3>Vevstolen</h3>
+<p>Da Sakichi Toyoda i 1902 laget en vevstol som stoppet av seg selv når en tråd røk, var den største gevinsten ikke færre feil. Det var at én operatør kunne passe dusinvis av vevstoler, fordi hun ikke lenger trengte å stå og se på hver av dem [1]. Ohno kalte dette <i>autonomasjon</i> — automasjon med et menneskelig preg [2].</p>
+
+<div class="callout"><b>Mennesket skal ikke stå og se på at maskinen går.</b> Den som overvåker en maskin som kunne overvåket seg selv, venter — og venting er muda.</div>
+
+<h3>Når mennesket stopper linja</h3>
+<p>Andon-snora hos Toyota stopper ikke linja midt i en syklus. Linja går til en fast posisjon, slik at hver operatør får fullført sin syklus. Det reduserer faren for defekter laget av selve stoppet [1]. Også det menneskelige stoppet er altså designet.</p>
+
+<h3>I dette emnet</h3>
+<p>Hvor i fabrikken på samlingen sto noen og ventet eller kontrollerte noe som kunne kontrollert seg selv? Det spørsmålet hører hjemme både i muda-analysen (4.1) og i drøftingen av jidoka (4.3).</p>
 `}
 
 };
@@ -775,7 +915,7 @@ const house = el('house'), slider = el('weekSlider'), badge = el('weekBadge'),
       peek = el('peekToggle'), statusLine = el('statusLine'),
       viewHouse = el('view-house'), viewPage = el('view-page');
 
-let uke = 38;
+let uke = 44;
 let forrigeSynlige = new Set();
 
 function farge(sid){ return (SEKSJONER.find(s=>s.id===sid)||{}).farge || 'var(--muted)'; }
